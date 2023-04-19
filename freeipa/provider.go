@@ -28,6 +28,12 @@ func Provider() *schema.Provider {
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("FREEIPA_PASSWORD", nil),
 			},
+			"insecure": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: descriptions["insecure"],
+			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"freeipa_user":             resourceUser(),
@@ -45,6 +51,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	server := d.Get("server").(string)
 	user := d.Get("user").(string)
 	password := d.Get("password").(string)
+	insecure := d.Get("insecure").(bool)
 
 	var diags diag.Diagnostics
 	if server == "" || user == "" || password == "" {
@@ -56,7 +63,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		return nil, diags
 	}
 
-	client, err := api.NewClient(server, user, password)
+	client, err := api.NewClient(server, user, password, insecure)
 	if err != nil {
 		return nil, diag.FromErr(err)
 	}
