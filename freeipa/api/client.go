@@ -39,6 +39,9 @@ type APIClient struct {
 
 func NewClient(server string, user string, password string) (*APIClient, error) {
 	jar, err := cookiejar.New(nil)
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure},
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -46,6 +49,7 @@ func NewClient(server string, user string, password string) (*APIClient, error) 
 	client := &APIClient{
 		httpClient: &http.Client{
 			Jar: jar,
+			Transport: tr,
 		},
 		server: server,
 	}
